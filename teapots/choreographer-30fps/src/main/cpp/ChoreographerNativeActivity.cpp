@@ -248,6 +248,13 @@ void Engine::StartChoreographer() {
 void Engine::choreographer_callback(long frameTimeNanos, void* data) {
   auto engine = reinterpret_cast<Engine*>(data);
 
+  timespec ts;
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+
+  if(llabs(frameTimeNanos - ts.tv_sec*1000000000LL - ts.tv_nsec) > 2000000000LL) {
+    LOGE("choreographer_callback error: frameTimeNanos=%ld; CLOCK_MONOTONIC = %ld.%09ld", frameTimeNanos, ts.tv_sec, ts.tv_nsec);
+  }
+
   // Post next callback for self.
   if (engine->has_focus_) {
     engine->StartChoreographer();
